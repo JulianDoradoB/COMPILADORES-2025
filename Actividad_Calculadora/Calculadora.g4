@@ -1,21 +1,29 @@
 grammar Calculadora;
 
-prog: expresion EOF;
+prog: (stat NEWLINE?)* EOF ;
 
-expresion
-    : funcion                              # CallFunction
-    | '-' expresion                       # Negativo
-    | expresion '^' expresion             # Potencia
-    | expresion ('*'|'/') expresion       # MultDiv
-    | expresion ('+'|'-') expresion       # AddSub
-    | '(' expresion ')'                   # Parentesis
-    | NUMBER                              # Numero
+stat
+    : ID '=' expr ';'?       # Asignacion
+    | expr ';'?              # ExprStat
     ;
 
-funcion
-    : ID '(' expresion ')'
+expr
+    : expr '+' expr          # Suma
+    | expr '-' expr          # Resta
+    | expr '*' expr          # Multiplicacion
+    | expr '/' expr          # Division
+    | '-' expr               # Negativo
+    | '(' expr ')'           # Parentesis
+    | func                   # Funcion
+    | NUMBER                 # Numero
+    | ID                     # Variable
     ;
 
-ID: [a-zA-Z]+;
-NUMBER: [0-9]+ ('.' [0-9]+)?;
-WS: [ \t\r\n]+ -> skip;
+func
+    : ID '(' expr ')'        # FuncionSimple
+    ;
+
+NUMBER  : [0-9]+ ('.' [0-9]+)? ;
+ID      : [a-zA-Z_][a-zA-Z_0-9]* ;
+NEWLINE : [\r\n]+ ;
+WS      : [ \t]+ -> skip ;
